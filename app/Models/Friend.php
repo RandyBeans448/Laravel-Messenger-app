@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use App\Traits\HasUuid;
 
 class Friend extends Model
 {
@@ -60,20 +61,6 @@ class Friend extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
-
-    /**
-     * The "booted" method of the model.
-     */
-    protected static function boot(): void
-    {
-        parent::boot();
-
-        static::creating(function ($model) {
-            if (empty($model->id)) {
-                $model->id = (string) Str::uuid();
-            }
-        });
-    }
 
     /**
      * Get the user that owns the friend.

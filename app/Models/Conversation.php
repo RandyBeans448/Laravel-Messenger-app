@@ -22,16 +22,6 @@ class Conversation extends Model
         'deleted_at' => 'datetime',
     ];
 
-    protected static function boot(): void
-    {
-        parent::boot();
-        static::creating(function ($model) {
-            if (empty($model->id)) {
-                $model->id = (string) Str::uuid();
-            }
-        });
-    }
-
     public function friends(): HasMany
     {
         return $this->hasMany(Friend::class);
