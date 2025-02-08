@@ -3,33 +3,18 @@
 namespace App\Interfaces;
 
 use App\Models\Friend;
-use App\Models\User;
 use App\Models\FriendRequest;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Database\Eloquent\Collection;
 
 interface FriendServiceInterface
 {
  
-    public function addFriend(FriendRequest $acceptedFriendRequest): JsonResponse;
+    public function addFriend(FriendRequest $acceptedFriendRequest): Friend;
 
-    public function getFriendById(string $id): JsonResponse;
+    public function getFriendById(string $id): Friend;
 
-    public function getAllFriends(): JsonResponse;
+    public function getAllFriends(): Collection;
     
-    public function getAllOfUsersFriends(string $userId): JsonResponse;
+    public function getAllOfUsersFriends(string $userId): Collection;
 
-    public function updateFriend(Friend $friend): JsonResponse;
-    
-    public function deleteFriend(string $id): JsonResponse;
-
-    public function alreadyFriends(string $userId, string $friendId,): bool;
-
-    public function _checkToSeeIfFriendShipExists(User $sender, User $receiver): JsonResponse;
-
-    public function _findFriendship(User $sender, User $receiver): JsonResponse;
-
-    public function _createAndGetFriend(User $sender, User $receiver): JsonResponse;
-
-    public function _createNewFriend(User $sender, User $receiver): JsonResponse;
-    
 }

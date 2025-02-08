@@ -4,25 +4,25 @@ namespace App\Services;
 
 use App\Interfaces\UserServiceInterface;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Collection;
 
 class UserService implements UserServiceInterface
 {
-    public function getAllUsers(): JsonResponse
+    public function getAllUsers(): Collection
     {
         try {
-            $users = User::all(); // Directly using Eloquent's built-in method
-            return response()->json($users, 200);
+            $users = User::all();
+            return $users;
         } catch (\Exception $error) {
             Log::error($error);
-            return response()->json(['error' => 'Failed to retrieve users'], 500);
+            throw $error;
         }
     }
 
-    public function getAllUsersWithNoPendingRequests(string $userId): JsonResponse
+    public function getAllUsersWithNoPendingRequests(string $userId): Collection
     {
         try {
             $users = User::where('id', '!=', $userId)
@@ -43,36 +43,34 @@ class UserService implements UserServiceInterface
                 })
                 ->get();
 
-            return response()->json($users, 200);
+            return $users;
         } catch (QueryException $error) {
             Log::error($error);
-            return response()->json(['error' => 'Failed to retrieve users'], 500);
+            throw $error;
         }
     }
 
-    public function getUserById(string $id, array $relations = []): JsonResponse
+    public function getUserById(string $id, array $relations = []): ?User
     {
         try {
-            $user = User::with($relations)->findOrFail($id);
-            return response()->json($user, 200);
+            return User::with($relations)->findOrFail($id);
         } catch (ModelNotFoundException $error) {
             Log::error("User with ID {$id} not found.");
-            return response()->json(['error' => 'User not found'], 404);
+            return null;
         } catch (QueryException $error) {
             Log::error($error);
-            return response()->json(['error' => 'Failed to retrieve user'], 500);
+            throw $error;
         }
     }
 
-    public function getOtherUsers(string $userId): JsonResponse
+    public function getOtherUsers(string $userId): Collection
     {
         try {
             $users = User::where('id', '!=', $userId)->get();
-            return response()->json($users, 200);
-        } catch 
-        (QueryException $error) {
+            return $users;
+        } catch (QueryException $error) {
             Log::error($error);
-            return response()->json(['error' => 'Failed to retrieve users'], 500);
+            throw $error;
         }
     }
 }

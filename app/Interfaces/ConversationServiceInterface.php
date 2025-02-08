@@ -7,12 +7,12 @@ use Illuminate\Http\JsonResponse;
 interface ConversationServiceInterface
 {
 
-    public function createConversation(array $friendsForConversation): JsonResponse;
+    public function createConversation(array $friendsForConversation): Conversation;
 
-    public function getConversationById(string $conversationId): JsonResponse;
+    public function getConversationById(string $conversationId): Conversation;
 
-    public function getConversationsForUser(string $userId): JsonResponse;
+    public function getConversationsForUser(string $userId): Conversation;
 
-    public function savedConversation(Conversation $conversation): JsonResponse;
+    public function saveConversation(Conversation $conversation): Conversation;
     
 }

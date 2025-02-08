@@ -5,14 +5,13 @@ namespace App\Services;
 use App\Models\Message;
 use App\Interfaces\MessageServiceInterface;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class MessageService implements MessageServiceInterface
 {
-    public function createMessage(Request $request): JsonResponse
+    public function createMessage(Request $request): Message
     {
         try {
             $newMessage = new Message();
@@ -21,7 +20,7 @@ class MessageService implements MessageServiceInterface
             $newMessage->sender_id = $request->input('sender_id');
             $newMessage->save();
 
-            return response()->json($newMessage, 201);
+            return $newMessage;
         } catch (QueryException $e) {
             Log::error('Error creating message: ' . $e->getMessage());
             throw new HttpException(500, 'Error creating message');

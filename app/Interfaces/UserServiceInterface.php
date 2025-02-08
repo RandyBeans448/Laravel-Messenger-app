@@ -1,15 +1,16 @@
 <?php
 
 namespace App\Interfaces;
-use Illuminate\Http\JsonResponse;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 
 interface UserServiceInterface
 {
-    public function getAllUsers(): JsonResponse;
+    public function getAllUsers(): Collection;
 
-    public function getAllUsersWithNoPendingRequests(string $userId): JsonResponse;
+    public function getAllUsersWithNoPendingRequests(string $userId): Collection;
 
-    public function getUserById(string $userId, array $relations): JsonResponse;
+    public function getUserById(string $userId, array $relations): ?User;
 
-    public function getOtherUsers(string $userId): JsonResponse;
+    public function getOtherUsers(string $userId): Collection;
 }
