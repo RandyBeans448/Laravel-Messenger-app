@@ -4,11 +4,16 @@ namespace App\Traits;
 
 use Illuminate\Support\Str;
 
-trait HasUuid
+trait DefaultModelTrait
 {
-    /**
-     * Boot function from Laravel Model.
-     */
+    protected $keyType = 'string';
+    public $incrementing = false;
+
+    protected $casts = [
+        'id' => 'string',
+        'deleted_at' => 'datetime',
+    ];
+
     protected static function bootHasUuid(): void
     {
         static::creating(function ($model) {

@@ -5,22 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
-use App\Traits\HasUuid;
+use App\Traits\DefaultModelTrait;
 
 class Conversation extends Model
 {
-    use SoftDeletes, HasUuid;
-
-    protected $keyType = 'string';
-    public $incrementing = false;
-
-    protected $casts = [
-        'id' => 'string',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
-    ];
+    use SoftDeletes, DefaultModelTrait;
 
     public function friends(): HasMany
     {
