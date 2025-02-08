@@ -11,9 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // create_friend_requests_table migration
         Schema::create('friend_requests', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
+            $table->uuid('sender_id');
+            $table->uuid('receiver_id');
+            $table->string('status')->default('pending');
+            $table->softDeletes();
+
+            
             $table->timestamps();
+
+            $table->foreign('sender_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+
+            $table->foreign('receiver_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
         });
     }
 

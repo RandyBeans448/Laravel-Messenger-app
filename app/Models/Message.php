@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Traits\DefaultModelTrait;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Message extends Model
 {
-    use SoftDeletes, DefaultModelTrait;
+    use SoftDeletes, HasUuids;
 
     protected $fillable = [
         'message',

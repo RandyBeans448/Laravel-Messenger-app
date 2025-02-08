@@ -28,6 +28,8 @@ class AuthService implements AuthServiceInterface
             'email'    => $validatedData['email'], // Assign user's email
             'password' => Hash::make($validatedData['password']), // Hash the password before saving
         ]);
+
+        echo $user;
         
         // Generate and return authentication token
         return $this->generateTokenResponse($user);

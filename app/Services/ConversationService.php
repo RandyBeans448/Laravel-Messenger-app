@@ -21,7 +21,7 @@ class ConversationService implements ConversationServiceInterface
                 'error' => $error->getMessage(),
                 'friends' => $friendsForConversation
             ]);
-            return $error;
+            throw $error;
         }
     }
 
@@ -41,7 +41,7 @@ class ConversationService implements ConversationServiceInterface
                 'id' => $id,
                 'error' => $error->getMessage()
             ]);
-            return $error;
+            throw $error;
         }
     }
 
@@ -60,7 +60,7 @@ class ConversationService implements ConversationServiceInterface
                 'userId' => $userId,
                 'error' => $error->getMessage()
             ]);
-            return $error;
+            throw $error;
         }
     }
 
@@ -74,7 +74,7 @@ class ConversationService implements ConversationServiceInterface
                 'conversationId' => $conversation->id,
                 'error' => $error->getMessage()
             ]);
-            return $error;
+            throw $error;
         }
     }
 }

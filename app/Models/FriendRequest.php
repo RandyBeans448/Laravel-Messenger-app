@@ -5,16 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Traits\DefaultModelTrait;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class FriendRequest extends Model
 {
-    use SoftDeletes, DefaultModelTrait;
+    use SoftDeletes, HasUuids;
 
-    public function requestSentBy(): BelongsTo
+    protected $fillable = ['sender_id', 'receiver_id',];
+
+
+    public function sender(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'request_sent_by');
-    }
+        return $this->belongsTo(User::class, 'sender_id');
+    }    
 
     public function receiver(): BelongsTo
     {

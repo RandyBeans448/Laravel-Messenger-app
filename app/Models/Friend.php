@@ -6,24 +6,31 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Traits\DefaultModelTrait;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
 
 class Friend extends Model
 {
-    use SoftDeletes, DefaultModelTrait;
+    use SoftDeletes, HasUuids;
+
+
+    protected $fillable = [
+        'user_id',
+        'friend_id',
+    ];
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'friend_id');
     }
 
-    public function friend(): HasMany
+    public function friends(): BelongsTo
     {
-        return $this->hasMany(Friend::class, 'parent_id', 'id');
+        return $this->belongsTo(User::class, 'friend_id');
     }
 
-    public function messages(): HasMany
+    public function conversation(): BelongsTo
     {
-        return $this->hasMany(Message::class, 'friend_id', 'id');
+       return $this->belongsTo(Conversation::class, 'conversation_id');
     }
 }
