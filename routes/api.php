@@ -5,6 +5,7 @@ use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\FriendController;
 use App\Http\Controllers\FriendRequestController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ChatController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -32,8 +33,9 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Friend requests
     Route::prefix('friend-requests')->group(function () {
-        Route::post('/', [FriendRequestController::class, 'sendRequest']);
-        Route::get('/', [FriendRequestController::class, 'getReceivedRequests']);
+        Route::post('/sendRequest', [FriendRequestController::class, 'sendRequest']);
+        Route::post('/resolveFriendRequest', [FriendRequestController::class, 'resolveFriendRequest']);
+        Route::get('/getReceivedRequests', [FriendRequestController::class, 'getReceivedRequests']);
     });
     
     // Friends management
@@ -51,5 +53,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/available', [UserController::class, 'getUsersWithNoPendingRequests'])
             ->name('users.available');
         Route::get('/{id}', [UserController::class, 'show']);
+    });
+
+    Route::prefix('chat-room')->group(function () {
+        Route::post('/{id}', [ChatController::class, 'sendMessage']);
     });
 });

@@ -6,6 +6,9 @@ use App\Services\FriendRequestService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Response;
+use App\Http\Requests\ResolveFriendRequestRequest;
+use Exception;
 
 class FriendRequestController extends Controller 
 {
@@ -72,6 +75,16 @@ class FriendRequestController extends Controller
             return response()->json([
                 'message' => $e->getMessage()
             ], 400);
+        }
+    }
+
+    public function resolveFriendRequest(ResolveFriendRequestRequest $request)
+    {
+        try {
+            $message = $this->friendRequestService->resolveFriendRequest($request->validated());
+            return response()->json(['message' => $message], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], $e->getCode() ?: Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

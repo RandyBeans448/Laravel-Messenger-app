@@ -13,12 +13,16 @@ return new class extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->string('message');
             $table->timestamps();
             $table->softDeletes();
+
 
             $table->uuid('conversation_id'); // Must match the UUID type in conversations
             $table->foreign('conversation_id')->references('id')->on('conversations')->onDelete('cascade');
 
+            $table->uuid('sender_id');
+            $table->foreign('sender_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

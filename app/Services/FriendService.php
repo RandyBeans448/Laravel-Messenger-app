@@ -20,57 +20,40 @@ class FriendService implements FriendServiceInterface
 
     public function addFriend(FriendRequest $acceptedFriendRequest): Friend
     {
+
         try {
-            $conversation = DB::transaction(function () use ($acceptedFriendRequest) {
-                // Get both users
-                $senderResponse = $this->userService->getUserById($acceptedFriendRequest->request_sent_by_id);
-                $receiverResponse = $this->userService->getUserById($acceptedFriendRequest->receiver_id);
 
-                if ($senderResponse->getStatusCode() !== 200 || $receiverResponse->getStatusCode() !== 200) {
-                    throw new \Exception('Failed to retrieve users');
-                }
+            $sender = $this->userService->getUserById($acceptedFriendRequest->sender_id);
+            $receiver = $this->userService->getUserById($acceptedFriendRequest->receiver_id);
 
-                $sender = json_decode($senderResponse->getContent());
-                $receiver = json_decode($receiverResponse->getContent());
+            if (!$sender || !$receiver || empty($sender->id) || empty($receiver->id)) {
+                throw new \Exception('Sender and Receiver IDs are required and must not be null.');
+            }
 
-                // Create friend records for both users
-                $newFriendForSender = Friend::create([
-                    'user_id' => $sender->id,
-                    'friend_user_id' => $receiver->id
-                ]);
+            $existingFriendship = Friend::where([
+                ['user_id', '=', $sender->id],
+                ['friend_id', '=', $receiver->id]
+            ])->exists();
+            
+            if ($existingFriendship) {
+                throw new \Exception('Friendship already exists.');
+            }
 
-                $newFriendForReceiver = Friend::create([
-                    'user_id' => $receiver->id,
-                    'friend_user_id' => $sender->id
-                ]);
+            $newFriendForSender = Friend::create([
+                'user_id' => $sender->id,
+                'friend_id' => $receiver->id
+            ]);
+   
+            $newFriendForReceiver = Friend::create([
+                'user_id' => $receiver->id,
+                'friend_id' => $sender->id
+            ]);
 
-                // Create and save the conversation
-                $conversationResponse = $this->conversationService->createConversation([
-                    $newFriendForSender->id,
-                    $newFriendForReceiver->id
-                ]);
+            $friendsForConversation = [$newFriendForSender, $newFriendForReceiver];
 
-                if ($conversationResponse->getStatusCode() !== 201) {
-                    throw new \Exception('Failed to create conversation');
-                }
-
-                $conversation = json_decode($conversationResponse->getContent());
-
-                // Update friend records with conversation
-                $newFriendForSender->update(['conversation_id' => $conversation->id]);
-                $newFriendForReceiver->update(['conversation_id' => $conversation->id]);
-
-                // Get the complete conversation with relationships
-                return Conversation::with([
-                    'friends',
-                    'friends.user',
-                    'messages',
-                    'messages.sender'
-                ])->findOrFail($conversation->id);
-            });
-
-            return $conversation;
-
+            $this->conversationService->createConversation($friendsForConversation);
+            return $newFriendForSender;
+    
         } catch (\Exception $error) {
             Log::error('Error adding friend', [
                 'friend_request_id' => $acceptedFriendRequest->id,
@@ -79,6 +62,7 @@ class FriendService implements FriendServiceInterface
             throw $error;
         }
     }
+    
 
     public function getFriendById(string $id): Friend
     {

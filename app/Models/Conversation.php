@@ -11,6 +11,12 @@ class Conversation extends Model
 {
     use SoftDeletes, HasUuids;
 
+    protected $fillable = [
+        'user_id',
+        'friend_id',
+        'conversation_id', // Ensure this is fillable
+    ];
+
     public function friends(): HasMany
     {
         return $this->hasMany(Friend::class);

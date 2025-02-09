@@ -16,7 +16,6 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->uuid('sender_id');
             $table->uuid('receiver_id');
-            $table->string('status')->default('pending');
             $table->softDeletes();
 
             

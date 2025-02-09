@@ -29,10 +29,10 @@ class UserService implements UserServiceInterface
                 ->whereNotIn('id', function ($query) use ($userId) {
                     $query->select('receiver_id')
                         ->from('friend_requests')
-                        ->where('request_sent_by_id', $userId);
+                        ->where('sender_id', $userId);
                 })
                 ->whereNotIn('id', function ($query) use ($userId) {
-                    $query->select('request_sent_by_id')
+                    $query->select('sender_id')
                         ->from('friend_requests')
                         ->where('receiver_id', $userId);
                 })

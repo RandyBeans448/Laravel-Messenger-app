@@ -2,19 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Events\MessageSent;
-
+use App\Services\ConversationService;
+use App\Services\MessageService;
+use Illuminate\Http\Request;
 
 class ChatController extends Controller
 {
-    public function sendMessage(Request $request)
+    protected $conversationService;
+    protected $messageService;
+
+    public function __construct(ConversationService $conversationService, MessageService $messageService)
     {
-        $message = $request->input('message');
+        $this->conversationService = $conversationService;
+        $this->messageService = $messageService;
+    }
 
-        // Broadcast the event
-        broadcast(new MessageSent($message));
+    public function sendMessage(Request $request, $uuid)
+    {
+        $conversation = $this->conversationService->getConversationById($uuid);
 
-        return response()->json(['message' => 'Broadcasted successfully!']);
+        if (!$conversation) {
+            return response()->json(['error' => 'Conversation not found'], 404);
+        }
+
+        $request->merge(['conversation_id' => $conversation->id]);
+
+        $message = $this->messageService->createMessage($request);
+    
+        broadcast(new MessageSent($message, $conversation->id))->toOthers();
+
+        return response()->json(['message' => 'Message sent!']);
     }
 }

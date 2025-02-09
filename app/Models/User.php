@@ -7,6 +7,9 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Support\Str;
+use Laravel\Sanctum\NewAccessToken;
+
 
 class User extends Authenticatable
 {
@@ -39,6 +42,19 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function createToken($name, array $abilities = ['*'], $expiresAt = null): NewAccessToken
+    {
+        $token = $this->tokens()->create([
+            'id' => Str::uuid(), // Generate UUID
+            'name' => $name,
+            'token' => hash('sha256', $plainTextToken = Str::random(64)),
+            'abilities' => $abilities,
+            'expires_at' => $expiresAt,
+        ]);
+
+        return new NewAccessToken($token, $plainTextToken); // Ensure proper return format
     }
 
     public function friends()

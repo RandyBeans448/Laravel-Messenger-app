@@ -11,11 +11,15 @@ class ConversationService implements ConversationServiceInterface
     public function createConversation(array $friendsForConversation): Conversation
     {
         try {
-            $conversation = new Conversation();
-            $conversation->save();
-            $conversation->friends()->attach($friendsForConversation);
 
+            $conversation = Conversation::create([]);
+    
+            foreach ($friendsForConversation as $friend) {
+                $friend->update(['conversation_id' => $conversation->id]);
+            }
+    
             return $conversation;
+    
         } catch (\Exception $error) {
             Log::error('Failed to create conversation', [
                 'error' => $error->getMessage(),
@@ -24,6 +28,7 @@ class ConversationService implements ConversationServiceInterface
             throw $error;
         }
     }
+    
 
     public function getConversationById(string $id): Conversation
     {
