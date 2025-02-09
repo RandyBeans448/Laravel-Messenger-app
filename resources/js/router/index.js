@@ -6,11 +6,6 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: '/dashboard',
-      component: () => import('@/components/Dashboard.vue'),
-      meta: { requiresAuth: true }, // Protected route
-    },
-    {
       path: '/login',
       component: () => import('@/components/Login.vue'),
       meta: { guestOnly: true }, // Only for logged-out users
