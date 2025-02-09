@@ -3,9 +3,9 @@
 namespace App\Interfaces;
 
 use App\Models\Message;
-use Illuminate\Http\Request;
+use App\Http\Requests\CreateMessageRequest;
 
 interface MessageServiceInterface
 {
-    public function createMessage(Request $payload): Message;
+    public function createMessage(CreateMessageRequest $payload): Message;
 }

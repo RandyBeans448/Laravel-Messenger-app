@@ -11,9 +11,7 @@ class Message extends Model
 {
     use SoftDeletes, HasUuids;
 
-    protected $fillable = [
-        'message',
-    ];
+    protected $fillable = ['message', 'conversation_id', 'sender_id'];
 
     public function conversation(): BelongsTo
     {

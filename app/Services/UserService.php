@@ -22,15 +22,8 @@ class UserService implements UserServiceInterface
      */
     public function getAllUsers(): Collection
     {
-        try {
-            // Retrieve all users from the database
-            $users = User::all();
-            return $users;
-        } catch (\Exception $error) {
-            // Log any exception that occurs
-            Log::error($error);
-            throw $error;
-        }
+        // Retrieve all users from the database
+        return User::all();
     }
 
     /**
@@ -42,32 +35,24 @@ class UserService implements UserServiceInterface
      */
     public function getAllUsersWithNoPendingRequests(string $userId): Collection
     {
-        try {
-            // Retrieve users who are not already friends or have pending friend requests
-            $users = User::where('id', '!=', $userId)
-                ->whereNotIn('id', function ($query) use ($userId) {
-                    $query->select('receiver_id')
-                        ->from('friend_requests')
-                        ->where('sender_id', $userId);
-                })
-                ->whereNotIn('id', function ($query) use ($userId) {
-                    $query->select('sender_id')
-                        ->from('friend_requests')
-                        ->where('receiver_id', $userId);
-                })
-                ->whereNotIn('id', function ($query) use ($userId) {
-                    $query->select('friend_id')
-                        ->from('friends')
-                        ->where('user_id', $userId);
-                })
-                ->get();
-
-            return $users;
-        } catch (QueryException $error) {
-            // Log any database query error
-            Log::error($error);
-            throw $error;
-        }
+        // Retrieve users who are not already friends or have pending friend requests
+        return User::where('id', '!=', $userId)
+            ->whereNotIn('id', function ($query) use ($userId) {
+                $query->select('receiver_id')
+                    ->from('friend_requests')
+                    ->where('sender_id', $userId);
+            })
+            ->whereNotIn('id', function ($query) use ($userId) {
+                $query->select('sender_id')
+                    ->from('friend_requests')
+                    ->where('receiver_id', $userId);
+            })
+            ->whereNotIn('id', function ($query) use ($userId) {
+                $query->select('friend_id')
+                    ->from('friends')
+                    ->where('user_id', $userId);
+            })
+            ->get();
     }
 
     /**
@@ -86,10 +71,6 @@ class UserService implements UserServiceInterface
             // Log the error if user is not found
             Log::error("User with ID {$id} not found.");
             return null;
-        } catch (QueryException $error) {
-            // Log any database query error
-            Log::error($error);
-            throw $error;
         }
     }
 
@@ -102,14 +83,7 @@ class UserService implements UserServiceInterface
      */
     public function getOtherUsers(string $userId): Collection
     {
-        try {
-            // Retrieve all users excluding the given user ID
-            $users = User::where('id', '!=', $userId)->get();
-            return $users;
-        } catch (QueryException $error) {
-            // Log any database query error
-            Log::error($error);
-            throw $error;
-        }
+        // Retrieve all users excluding the given user ID
+        return User::where('id', '!=', $userId)->get();
     }
 }

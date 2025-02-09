@@ -20,27 +20,17 @@ class ConversationService implements ConversationServiceInterface
      */
     public function createConversation(array $friendsForConversation): Conversation
     {
-        try {
-            // Create a new conversation
-            $conversation = Conversation::create([]);
-    
-            // Associate each friend with the new conversation
-            foreach ($friendsForConversation as $friend) {
-                $friend->update(['conversation_id' => $conversation->id]);
-            }
-    
-            return $conversation;
-    
-        } catch (\Exception $error) {
-            // Log the error with relevant details
-            Log::error('Failed to create conversation', [
-                'error' => $error->getMessage(),
-                'friends' => $friendsForConversation
-            ]);
-            throw $error;
+        // Create a new conversation
+        $conversation = Conversation::create([]);
+
+        // Associate each friend with the new conversation
+        foreach ($friendsForConversation as $friend) {
+            $friend->update(['conversation_id' => $conversation->id]);
         }
+
+        return $conversation;
     }
-    
+
     /**
      * Retrieves a conversation by its ID, including friends, messages, and senders.
      * 
@@ -50,24 +40,13 @@ class ConversationService implements ConversationServiceInterface
      */
     public function getConversationById(string $id): Conversation
     {
-        try {
-            // Retrieve the conversation with related data
-            $conversation = Conversation::with([
-                'friends',
-                'friends.user',
-                'messages',
-                'messages.sender',
-            ])->findOrFail($id);
-
-            return $conversation;
-        } catch (\Exception $error) {
-            // Log the error with the conversation ID
-            Log::error('Failed to retrieve conversation', [
-                'id' => $id,
-                'error' => $error->getMessage()
-            ]);
-            throw $error;
-        }
+        // Retrieve the conversation with related data
+        return Conversation::with([
+            'friends',
+            'friends.user',
+            'messages',
+            'messages.sender',
+        ])->findOrFail($id);
     }
 
     /**
@@ -79,23 +58,12 @@ class ConversationService implements ConversationServiceInterface
      */
     public function getConversationsForUser(string $userId): Conversation
     {
-        try {
-            // Fetch conversations where the user is a participant
-            $conversations = Conversation::whereHas('friends.user', function ($query) use ($userId) {
-                $query->where('id', $userId);
-            })
-            ->with(['friends', 'friends.user', 'messages'])
-            ->get();
-
-            return $conversations;
-        } catch (\Exception $error) {
-            // Log the error with the user ID
-            Log::error('Failed to retrieve conversations for user', [
-                'userId' => $userId,
-                'error' => $error->getMessage()
-            ]);
-            throw $error;
-        }
+        // Fetch conversations where the user is a participant
+        return Conversation::whereHas('friends.user', function ($query) use ($userId) {
+            $query->where('id', $userId);
+        })
+        ->with(['friends', 'friends.user', 'messages'])
+        ->get();
     }
 
     /**
@@ -107,17 +75,8 @@ class ConversationService implements ConversationServiceInterface
      */
     public function saveConversation(Conversation $conversation): Conversation      
     {
-        try {
-            // Save the conversation
-            $conversation->save();
-            return $conversation->fresh();
-        } catch (\Exception $error) {
-            // Log the error with the conversation ID
-            Log::error('Failed to save conversation', [
-                'conversationId' => $conversation->id,
-                'error' => $error->getMessage()
-            ]);
-            throw $error;
-        }
+        // Save the conversation
+        $conversation->save();
+        return $conversation->fresh();
     }
 }

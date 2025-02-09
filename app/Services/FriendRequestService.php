@@ -41,42 +41,36 @@ class FriendRequestService implements FriendRequestServiceInterface
      */
     public function addFriend(string $userId, string $friendId): FriendRequest
     {
-        try {
-            // Prevent a user from sending a request to themselves
-            if ($userId === $friendId) {
-                throw new NotFoundHttpException('Cannot add yourself as a friend.');
-            }
-
-            // Check if a friend request already exists between the users
-            $existingRequest = FriendRequest::where([
-                ['sender_id', $userId],
-                ['receiver_id', $friendId]
-            ])->first();
-
-            if ($existingRequest) {
-                throw new NotFoundHttpException('Friend request already exists.');
-            }
-
-            // Retrieve sender and receiver user objects
-            $user = $this->userService->getUserById($userId);
-            $friendCandidate = $this->userService->getUserById($friendId);
-
-            if (!$user || !$friendCandidate) {
-                throw new NotFoundHttpException('User or friend candidate not found.');
-            }
-
-            // Create and save the new friend request
-            $newFriendRequest = new FriendRequest();
-            $newFriendRequest->sender_id = $userId;
-            $newFriendRequest->receiver_id = $friendId;
-            $newFriendRequest->save();
-
-            return $newFriendRequest;
-        } catch (\Exception $error) {
-            // Log any error that occurs
-            Log::error($error->getMessage());
-            throw $error;
+        // Prevent a user from sending a request to themselves
+        if ($userId === $friendId) {
+            throw new NotFoundHttpException('Cannot add yourself as a friend.');
         }
+
+        // Check if a friend request already exists between the users
+        $existingRequest = FriendRequest::where([
+            ['sender_id', $userId],
+            ['receiver_id', $friendId]
+        ])->first();
+
+        if ($existingRequest) {
+            throw new NotFoundHttpException('Friend request already exists.');
+        }
+
+        // Retrieve sender and receiver user objects
+        $user = $this->userService->getUserById($userId);
+        $friendCandidate = $this->userService->getUserById($friendId);
+
+        if (!$user || !$friendCandidate) {
+            throw new NotFoundHttpException('User or friend candidate not found.');
+        }
+
+        // Create and save the new friend request
+        $newFriendRequest = new FriendRequest();
+        $newFriendRequest->sender_id = $userId;
+        $newFriendRequest->receiver_id = $friendId;
+        $newFriendRequest->save();
+
+        return $newFriendRequest;
     }
 
     /**
@@ -88,18 +82,12 @@ class FriendRequestService implements FriendRequestServiceInterface
      */
     public function getReceivedFriendRequests(string $userId): Collection
     {
-        try {
-            return FriendRequest::with(['requestSentBy', 'receiver'])
-                ->where(function ($query) use ($userId) {
-                    $query->where('sender_id', $userId)
-                            ->orWhere('receiver_id', $userId);
-                })
-                ->get();
-        } catch (\Exception $error) {
-            // Log any errors encountered
-            Log::error($error->getMessage());
-            throw $error;
-        }
+        return FriendRequest::with(['requestSentBy', 'receiver'])
+            ->where(function ($query) use ($userId) {
+                $query->where('sender_id', $userId)
+                        ->orWhere('receiver_id', $userId);
+            })
+            ->get();
     }
 
     /**
@@ -111,31 +99,27 @@ class FriendRequestService implements FriendRequestServiceInterface
      */
     public function resolveFriendRequest(array $data): string
     {
-        try {
-            // Find the friend request with sender and receiver details
-            $friendRequest = FriendRequest::with(['sender', 'receiver'])
-                ->find($data['friendRequestId']);
-        
-            if (!$friendRequest) {
-                throw new Exception('Friend request not found', 404);
-            }
-
-            if ($data['response']) {
-                // Accept friend request and create friendship record
-                DB::transaction(function () use ($friendRequest) {
-                    $this->friendService->addFriend($friendRequest);
-                    $this->deleteFriendRequest($friendRequest->id);
-                });
-
-                return 'Friend request accepted';
-            } else {
-                // Decline the friend request
-                $this->deleteFriendRequest($friendRequest->id);
-                return 'Friend request declined';
-            }
-        } catch (Exception $e) {
-            throw new Exception('Error resolving this friendship request: ' . $e->getMessage(), $e->getCode());
+        // Find the friend request with sender and receiver details
+        $friendRequest = FriendRequest::with(['sender', 'receiver'])
+            ->find($data['friendRequestId']);
+    
+        if (!$friendRequest) {
+            throw new Exception('Friend request not found', 404);
         }
+
+        if ($data['response']) {
+            // Accept friend request and create friendship record
+            DB::transaction(function () use ($friendRequest) {
+                $this->friendService->addFriend($friendRequest);
+                $this->deleteFriendRequest($friendRequest->id);
+            });
+
+            return 'Friend request accepted';
+        }
+
+        // Decline the friend request
+        $this->deleteFriendRequest($friendRequest->id);
+        return 'Friend request declined';
     }
 
     /**
