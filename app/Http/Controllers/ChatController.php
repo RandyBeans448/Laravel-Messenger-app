@@ -6,6 +6,8 @@ use App\Events\MessageSent;
 use App\Services\ConversationService;
 use App\Services\MessageService;
 use Illuminate\Http\Request;
+use App\Http\Requests\CreateMessageRequest;
+
 
 /**
  * Class ChatController
@@ -30,7 +32,10 @@ class ChatController extends Controller
      * @param ConversationService $conversationService Service for handling conversations.
      * @param MessageService $messageService Service for handling messages.
      */
-    public function __construct(ConversationService $conversationService, MessageService $messageService)
+    public function __construct(
+        ConversationService $conversationService,
+        MessageService $messageService,
+        )
     {
         // Initialize conversation service.
         $this->conversationService = $conversationService;
@@ -46,26 +51,27 @@ class ChatController extends Controller
      * @param string $uuid Unique identifier of the conversation.
      * @return \Illuminate\Http\JsonResponse JSON response with status.
      */
-    public function sendMessage(Request $request, $uuid)
+    public function sendMessage(CreateMessageRequest $request, $uuid)
     {
-        // Retrieve the conversation by its UUID.
+        // Retrieve conversation by UUID
         $conversation = $this->conversationService->getConversationById($uuid);
-
-        // If conversation is not found, return a 404 error response.
+    
         if (!$conversation) {
             return response()->json(['error' => 'Conversation not found'], 404);
         }
-
-        // Merge conversation ID into request data.
-        $request->merge(['conversation_id' => $conversation->id]);
-
-        // Create a new message using the message service.
-        $message = $this->messageService->createMessage($request);
     
-        // Broadcast the message to other users in the conversation.
+        // Get validated data (only 'message' at this point)
+        $validatedData = $request->validated();
+    
+        // Add additional fields not provided by the client
+        $validatedData['conversation_id'] = $conversation->id;
+        $validatedData['sender_id'] = $request->user()->id;
+    
+        // Create message with the full dataset
+        $message = $this->messageService->createMessage($validatedData);
+    
         broadcast(new MessageSent($message, $conversation->id))->toOthers();
-
-        // Return success response.
+    
         return response()->json(['message' => 'Message sent!']);
     }
 }

@@ -15,7 +15,6 @@ class CreateMessageRequest extends FormRequest
     {
         return [
             'message' => ['required', 'string', 'max:5000'],
-            'conversation_id' => ['required', 'integer', 'exists:conversations,id'],
         ];
     }
 }

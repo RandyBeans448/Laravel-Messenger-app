@@ -7,5 +7,5 @@ use App\Http\Requests\CreateMessageRequest;
 
 interface MessageServiceInterface
 {
-    public function createMessage(CreateMessageRequest $payload): Message;
+    public function createMessage(array $payload): Message;
 }
