@@ -24,10 +24,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Authentication
     Route::post('/logout', [AuthController::class, 'logout']);
-
-    // User profile
-    Route::get('/user', fn (Request $request) => $request->user());
-
     
     // Conversations
     Route::prefix('conversations')->group(function () {
@@ -50,7 +46,6 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Users
     Route::prefix('users')->group(function () {
-
         Route::get('/others', [UserController::class, 'getOtherUsers']);
         Route::get('/available', [UserController::class, 'getUsersWithNoPendingRequests']);
         Route::get('/{id}', [UserController::class, 'getUserById']);
