@@ -16,25 +16,28 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Public routes
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);// working
+Route::post('/login', [AuthController::class, 'login']);// working
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
+
+    // Authentication
+    Route::post('/logout', [AuthController::class, 'logout']);
+
     // User profile
     Route::get('/user', fn (Request $request) => $request->user());
-    Route::post('/logout', [AuthController::class, 'logout']);
+
     
     // Conversations
     Route::prefix('conversations')->group(function () {
-        Route::get('/{id}', [ConversationController::class, 'getConversationById']);
-        Route::post('/', [ConversationController::class, 'createNewConversation']);
+        Route::get('/{id}', [ConversationController::class, 'getConversationById']);// working
     });
     
     // Friend requests
     Route::prefix('friend-requests')->group(function () {
-        Route::post('/sendRequest', [FriendRequestController::class, 'sendRequest']);
-        Route::post('/resolveFriendRequest', [FriendRequestController::class, 'resolveFriendRequest']);
+        Route::post('/sendRequest', [FriendRequestController::class, 'sendRequest']); // working
+        Route::post('/resolveFriendRequest', [FriendRequestController::class, 'resolveFriendRequest']); // working
         Route::get('/getReceivedRequests', [FriendRequestController::class, 'getReceivedRequests']);
     });
     
@@ -43,19 +46,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [FriendController::class, 'getAllFriends']);
         Route::get('/{id}', [FriendController::class, 'getFriend']);
         Route::get('/user/{userId}', [FriendController::class, 'getUserFriends']);
-        Route::post('/{friendRequest}/accept', [FriendController::class, 'acceptFriendRequest']);
     });
     
     // Users
     Route::prefix('users')->group(function () {
-        Route::get('/', [UserController::class, 'index']);
+
         Route::get('/others', [UserController::class, 'getOtherUsers']);
-        Route::get('/available', [UserController::class, 'getUsersWithNoPendingRequests'])
-            ->name('users.available');
-        Route::get('/{id}', [UserController::class, 'show']);
+        Route::get('/available', [UserController::class, 'getUsersWithNoPendingRequests']);
+        Route::get('/{id}', [UserController::class, 'getUserById']);
     });
 
     Route::prefix('chat-room')->group(function () {
-        Route::post('/{id}', [ChatController::class, 'sendMessage']);
+        Route::post('/{id}', [ChatController::class, 'sendMessage']); // working
     });
 });

@@ -65,6 +65,16 @@
   </template>
   
   <style scoped>
+
+    body {
+    background-color: #121212; /* Dark background */
+    color: white; /* Ensures text remains readable */
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    }
+
+
   .container {
     max-width: 900px;
     margin: auto;
