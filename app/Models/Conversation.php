@@ -14,7 +14,6 @@ class Conversation extends Model
     protected $fillable = [
         'user_id',
         'friend_id',
-        'conversation_id', // Ensure this is fillable
     ];
 
     public function friends(): HasMany
